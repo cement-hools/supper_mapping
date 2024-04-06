@@ -1,57 +1,73 @@
 class SupperMapping:
     """
-    Этот класс реализует отображение, которое позволяет получать значения
+    Этот класс реализует словарь, которое позволяет получать значения
     как по прямым, так и по обратным ключам. При создании экземпляра класса
     можно указать следующие параметры:
 
-    * `mapping`: отображение, которое нужно использовать для инициализации
+    * `mapping`: словарь, которое нужно использовать для инициализации
         экземпляра класса SupperMapping.
     * `default`: значение по умолчанию, которое будет возвращаться методом get,
-        если указанный ключ не будет найден в отображении.
+        если указанный ключ не будет найден в словаре.
     * `default_reverse`: значение по умолчанию, которое будет возвращаться
         методом get, если указанный ключ не будет найден
-        из обратного отображения.
+        из обратного словаря.
 
     Методы класса SupperMapping:
 
     * `__contains__`: возвращает `True`, если указанный ключ присутствует
-        в отображении или в обратном отображении, и `False` в противном случае.
-    * `__getitem__`: возвращает значение по указанному ключу из отображения
-        или из обратного отображения. Если ключ не найден,
+        в словаре или в обратном словаре, и `False` в противном случае.
+    * `__getitem__`: возвращает значение по указанному ключу из словаря
+        или из обратного словаря. Если ключ не найден,
         генерирует исключение `KeyError`.
-    * `get`: возвращает значение по указанному ключу из отображения или
-        из обратного отображения. Если ключ не найден, возвращает
+    * `get`: возвращает значение по указанному ключу из словаря или
+        из обратного словаря. Если ключ не найден, возвращает
         значение по умолчанию, указанное в параметрах
         `default` или `default_reverse`.
     * `_key_in_dict`: вспомогательный метод, который проверяет,
-        присутствует ли указанный ключ в указанном словаре. Возвращает кортеж, содержащий ключ и логическое значение, указывающее, присутствует ли ключ в словаре.
-    * `_convert_key_type`: статический метод, который преобразует тип указанного ключа к типу ключей указанного словаря. Если преобразование невозможно, генерирует исключение `ValueError`.
-    * `_check_
+        присутствует ли указанный ключ в указанном словаре.
+        Возвращает кортеж, содержащий ключ и логическое значение, указывающее,
+        присутствует ли ключ в словаре.
+    * `_convert_key_type`: статический метод, который преобразует
+        тип указанного ключа к типу ключей указанного словаря.
+        Если преобразование невозможно, генерирует исключение `ValueError`.
+    * `_check_default_params`: вспомогательный метод, который проверяет,
+        указан какой-то один из параметров `default` и `default_reverse`.
+        Если указаны оба параметра, генерирует исключение `ValueError`.
     """
 
-    def __init__(self, mapping, default=None, default_reverse=None):
+    def __init__(
+            self,
+            mapping: dict,
+            default: str | int | None = None,
+            default_key: str | int | None = None
+    ):
         """
         Инициализирует экземпляр класса SupperMapping.
-        :param mapping: отображение, которое нужно использовать для инициализации экземпляра класса SupperMapping.
-        :param default: значение по умолчанию, которое будет возвращаться методом get, если указанный ключ не будет найден в отображении.
-        :param default_reverse: значение по умолчанию, которое будет возвращаться методом get, если указанный ключ не будет найден в обратном отображении.
+
+        :param mapping: словарь, которое нужно использовать
+            для инициализации экземпляра класса SupperMapping.
+        :param default: значение по умолчанию, которое будет возвращаться
+            методом get, если указанный ключ не будет найден в словаре.
+        :param default_key: значение ключа по умолчанию,
+            который будет возвращаться значение методом get, если значение по ключу
+            не будет найдено.
         """
-        self._check_default_params(default, default_reverse)
+        self._check_default_params(default, default_key)
         self.default = default
-        self.default_reverse_key = default_reverse
+        self.default_key = default_key
         self._mapping = mapping
         self._reverse_mapping = {
             v: k for k, v in self._mapping.items()
         }
 
-    def __contains__(self, key):
+    def __contains__(self, key: str | int) -> bool:
         """
-        Возвращает True, если указанный ключ присутствует в отображении
-        или в обратном отображении, и False в противном случае.
+        Возвращает True, если указанный ключ присутствует в словаре
+        или в обратном словаре, и False в противном случае.
 
-        :param key: ключ, который нужно проверить на присутствие в отображении.
+        :param key: ключ, который нужно проверить на присутствие в словаре.
         :return: логическое значение, указывающее,
-            присутствует ли указанный ключ в отображении.
+            присутствует ли указанный ключ в словаре.
         """
         for target_dict in (self._mapping, self._reverse_mapping):
             _, in_dict = self._key_in_dict(key, target_dict)
@@ -59,10 +75,10 @@ class SupperMapping:
                 return True
         return False
 
-    def __getitem__(self, key):
+    def __getitem__(self, key: str | int) -> str | int:
         """
-        Возвращает значение по указанному ключу из отображения
-        или из обратного отображения.
+        Возвращает значение по указанному ключу из словаря
+        или из обратного словаря.
         Если ключ не найден, генерирует исключение KeyError.
 
         :param key: ключ, по которому нужно получить значение.
@@ -74,19 +90,25 @@ class SupperMapping:
                 return target_dict[key]
         raise KeyError(key)
 
-    def get(self, key, default=None, default_reverse_key=None):
+    def get(
+            self,
+            key: str | int,
+            default: str | int | None = None,
+            default_key: str | int = None
+    ) -> str | int | None:
         """
-        Возвращает значение по указанному ключу из отображения
-        или из обратного отображения.
+        Возвращает значение по указанному ключу из словаря
+        или из обратного словаря.
         Если ключ не найден, возвращает значение по умолчанию,
-        указанное в параметрах default или default_reverse.
+        указанное в параметрах default или default_key.
         Если ни один из этих параметров не указан, возвращает None.
+
         :param key: ключ, по которому нужно получить значение.
         :param default: значение по умолчанию, которое будет возвращаться,
-            если указанный ключ не будет найден в отображении.
-        :param default_reverse_key: ключ по умолчанию для поиска значения из
-            отображения которое будет возвращаться,
-            если указанный ключ не будет найден в отображении.
+            если указанный ключ не будет найден в словаре.
+        :param default_key: ключ по умолчанию для поиска значения из
+            словаря которое будет возвращаться,
+            если указанный ключ не будет найден в словаре.
         :return: значение, соответствующее указанному ключу,
             или значение по умолчанию.
         """
@@ -94,17 +116,21 @@ class SupperMapping:
             return self[key]
         except KeyError:
             pass
-        self._check_default_params(default, default_reverse_key)
+        self._check_default_params(default, default_key)
 
-        if default_reverse_key:
-            return self.get(default_reverse_key)
+        if default_key:
+            return self.get(default_key)
         if default:
             return default
-        if self.default_reverse_key:
-            return self.get(default_reverse_key)
+        if self.default_key:
+            return self.get(default_key)
         return self.default
 
-    def _key_in_dict(self, key, target_dict):
+    def _key_in_dict(
+            self,
+            key: str | int,
+            target_dict: dict
+    ) -> tuple[str | int, bool]:
         """
         Проверяет, присутствует ли указанный ключ в указанном словаре.
 
@@ -118,13 +144,15 @@ class SupperMapping:
             key = self._convert_key_type(key, target_dict)
         except ValueError:
             return key, False
-        return key, True
+        is_in_dict = key in self._mapping or key in self._reverse_mapping
+        return key, is_in_dict
 
     @staticmethod
-    def _convert_key_type(key, target_dict):
+    def _convert_key_type(key: str | int, target_dict: dict) -> str | int:
         """
         Преобразует тип указанного ключа к типу ключей указанного словаря.
         Если преобразование невозможно, генерирует исключение ValueError.
+
         :param key: ключ, тип которого нужно преобразовать.
         :param target_dict: словарь, ключи которого используются
             для определения типа, к которому нужно преобразовать
@@ -144,11 +172,12 @@ class SupperMapping:
         """
         Проверяет, были ли указаны оба параметра default и default_reverse.
         Если оба параметра указаны, генерирует исключение ValueError.
+
         :param args: список параметров, которые нужно проверить
             на наличие вместе
         :return: None
         """
-        if any(args):
+        if all(args):
             raise ValueError(
                 "Cannot specify both "
                 "default and default_reverse "
