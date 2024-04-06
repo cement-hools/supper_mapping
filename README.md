@@ -22,22 +22,29 @@ SupperMapping поддерживает следующие методы:
 ## Примеры использования
 
 ```python
-# Проверка наличия ключа в словаре
-assert 1 in supper_mapping
-assert 'one' in supper_mapping
-assert 4 not in supper_mapping
-assert 'four' not in supper_mapping
+mapping_dict = {
+            1: 'one',
+            2: 'two',
+            3: 'three'
+        }
+
+digit_mapping = SupperMapping(mapping_dict)
+
+# Проверка наличия ключа
+assert 1 in digit_mapping
+assert 'one' in digit_mapping
+assert 4 not in digit_mapping
+assert 'four' not in digit_mapping
 
 # Получение значения по ключу
-assert supper_mapping[1] == 'one'
-assert supper_mapping['two'] == 2
-assert supper_mapping.get('2') == 'two'
+assert digit_mapping[1] == 'one'
+assert digit_mapping['two'] == 2
+assert digit_mapping['2'] == 'two'
+assert digit_mapping.get('2') == 'two'
+assert digit_mapping.get(4) == None
 
 # Получение значения по умолчанию, если ключ не найден
-assert supper_mapping.get(4, 'default') == 'default'
-assert supper_mapping.get('four', 'default_reverse') == 'default_reverse'
-
-# Получение ключа по умолчанию, если значение не найдено
-assert supper_mapping.reverse_get(4, 'default') == 'default'
-assert supper_mapping.reverse_get('four', 'default_reverse') == 'default_reverse'
+assert digit_mapping.get(4, 'five') == 'five'
+assert digit_mapping.get('four', 2) == 2
+assert digit_mapping.get('four', default_key=2) == 'two'
 ```
