@@ -33,10 +33,6 @@ assert supper_mapping[1] == 'one'
 assert supper_mapping['two'] == 2
 assert supper_mapping.get('2') == 'two'
 
-# Получение ключа по значению
-assert supper_mapping.reverse_get('one') == 1
-assert supper_mapping.reverse_get(2) == 'two'
-
 # Получение значения по умолчанию, если ключ не найден
 assert supper_mapping.get(4, 'default') == 'default'
 assert supper_mapping.get('four', 'default_reverse') == 'default_reverse'
