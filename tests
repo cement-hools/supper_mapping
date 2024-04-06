@@ -1,1 +1,48 @@
 
+import unittest
+
+from main import SupperMapping
+
+
+class TestSupperMapping(unittest.TestCase):
+
+    def setUp(self):
+        self.mapping = {
+            1: 'one',
+            2: 'two',
+            3: 'three'
+        }
+        self.supper_mapping = SupperMapping(self.mapping)
+
+    def test_contains(self):
+        self.assertTrue(1 in self.supper_mapping)
+        self.assertTrue('1' in self.supper_mapping)
+        self.assertTrue('one' in self.supper_mapping)
+        self.assertFalse(4 in self.supper_mapping)
+        self.assertFalse('four' in self.supper_mapping)
+
+    def test_getitem(self):
+        self.assertEqual(self.supper_mapping[1], 'one')
+        self.assertEqual(self.supper_mapping['1'], 'one')
+        self.assertEqual(self.supper_mapping['two'], 2)
+        with self.assertRaises(KeyError):
+            self.supper_mapping[4]
+        with self.assertRaises(KeyError):
+            self.supper_mapping['four']
+
+    def test_get(self):
+        self.assertEqual(self.supper_mapping.get(1), 'one')
+        self.assertEqual(self.supper_mapping.get('two'), 2)
+        self.assertEqual(self.supper_mapping.get('2'), 'two')
+        self.assertEqual(self.supper_mapping.get(4, 'default'), 'default')
+        self.assertEqual(self.supper_mapping.get('four', 'default_reverse'), 'default_reverse')
+        self.assertEqual(self.supper_mapping.get(4), None)
+        self.assertEqual(self.supper_mapping.get('four'), None)
+
+    def test_default_params(self):
+        with self.assertRaises(ValueError):
+            SupperMapping(self.mapping, default=1, default_key=2)
+
+
+if __name__ == '__main__':
+    unittest.main()
